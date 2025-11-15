@@ -34,6 +34,7 @@ export const getAllReportsService = async (
   };
 };
 
+
 export const updateReportSettingService = async (
   userId: string,
   body: UpdateReportSettingType
