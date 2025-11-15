@@ -1,0 +1,192 @@
+import { Request, Response } from "express";
+import jwt, { JwtPayload } from "jsonwebtoken";
+import { HTTPSTATUS } from "../config/http.config";
+import { asyncHandler } from "../middlewares/asyncHandler.middleware";
+import { bulkDeleteTransactionSchema, bulkTransactionSchema, createTransactionSchema, transactionIdSchema, updateTransactionSchema } from "../validators/transaction.validator";
+import {
+    bulkDeleteTransactionService,
+  bulkTransactionService,
+  createTransactionService,
+  deleteTransactionService,
+  duplicateTransactionService,
+  getAllTransactionService,
+  getTransactionByIdService,
+  scanReceiptService,
+  updateTransactionService,
+} from "../services/transaction.service";
+import { TransactionTypeEnum } from "../models/transaction.model";
+import { Env } from "../config/env.config";
+
+
+import fs from "fs";
+import path from "path";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+// ✅ Helper: Extract & verify token manually
+const getUserIdFromToken = (req: Request): string | null => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) return null;
+
+    const token = authHeader.split(" ")[1];
+    const decoded = jwt.verify(token, Env.JWT_SECRET) as JwtPayload;
+
+    return decoded.userId || null;
+  } catch {
+    return null;
+  }
+};
+
+// ✅ Create Transaction
+export const createTransactionController = asyncHandler(async (req: Request, res: Response) => {
+  const userId = getUserIdFromToken(req);
+  if (!userId) {
+    return res.status(HTTPSTATUS.UNAUTHORIZED).json({
+      message: "Unauthorized: Token missing or invalid",
+    });
+  }
+
+  const body = createTransactionSchema.parse(req.body);
+  const transaction = await createTransactionService(body, userId);
+
+  return res.status(HTTPSTATUS.CREATED).json({
+    message: "Transaction created successfully",
+    transaction,
+  });
+});
+
+// ✅ Get All Transactions
+export const getAllTransactionController = asyncHandler(async (req: Request, res: Response) => {
+  const userId = getUserIdFromToken(req);
+  if (!userId) {
+    return res.status(HTTPSTATUS.UNAUTHORIZED).json({
+      message: "Unauthorized: Token missing or invalid",
+    });
+  }
+
+  const filters = {
+    keyword: req.query.keyword as string | undefined,
+    type: req.query.type as keyof typeof TransactionTypeEnum | undefined,
+    recurringStatus: req.query.recurringStatus as "RECURRING" | "NON_RECURRING" | undefined,
+  };
+
+  const pagination = {
+    pageSize: parseInt(req.query.pageSize as string) || 20,
+    pageNumber: parseInt(req.query.pageNumber as string) || 1,
+  };
+
+  const result = await getAllTransactionService(userId, filters, pagination);
+
+  return res.status(HTTPSTATUS.OK).json({
+    message: "Transaction fetched successfully",
+    ...result,
+  });
+});
+
+// ✅ Get Transaction by ID
+export const getTransactionByIdController = asyncHandler(async (req: Request, res: Response) => {
+  const userId = getUserIdFromToken(req);
+  if (!userId) {
+    return res.status(HTTPSTATUS.UNAUTHORIZED).json({
+      message: "Unauthorized: Token missing or invalid",
+    });
+  }
+
+  const transactionId = transactionIdSchema.parse(req.params.id);
+  const transaction = await getTransactionByIdService(userId, transactionId);
+
+  return res.status(HTTPSTATUS.OK).json({
+    message: "Transaction fetched successfully",
+    transaction,
+  });
+});
+
+
+export const duplicateTransactionController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = getUserIdFromToken(req);
+    if (!userId) {
+      return res.status(HTTPSTATUS.UNAUTHORIZED).json({
+        message: "Unauthorized: Token missing or invalid",
+      });
+    }
+
+    const transactionId = transactionIdSchema.parse(req.params.id);
+    const transaction = await duplicateTransactionService(userId, transactionId);
+
+    return res.status(HTTPSTATUS.OK).json({
+      message: "Transaction duplicated successfully",
+      transaction,
+    });
+  }
+);
+
+export const updateTransactionController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.user?._id;
+    const transactionId = transactionIdSchema.parse(req.params.id);
+    const body = updateTransactionSchema.parse(req.body);
+
+    await updateTransactionService(userId, transactionId, body);
+
+    return res.status(HTTPSTATUS.OK).json({
+      message: "Transaction updated successfully",
+    });
+  }
+);
+
+export const deleteTransactionController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.user?._id;
+    const transactionId = transactionIdSchema.parse(req.params.id);
+
+    await deleteTransactionService(userId, transactionId);
+
+    return res.status(HTTPSTATUS.OK).json({
+      message: "Transaction deleted successfully",
+    });
+  }
+);
+
+export const bulkDeleteTransactionController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.user?._id;
+    const { transactionIds } = bulkDeleteTransactionSchema.parse(req.body);
+
+    const result = await bulkDeleteTransactionService(userId, transactionIds);
+
+    return res.status(HTTPSTATUS.OK).json({
+      message: "Transaction deleted successfully",
+      ...result,
+    });
+  }
+);
+
+export const bulkTransactionController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.user?._id;
+    const { transactions } = bulkTransactionSchema.parse(req.body);
+
+    const result = await bulkTransactionService(userId, transactions);
+
+    return res.status(HTTPSTATUS.OK).json({
+      message: "Bulk transaction inserted successfully",
+      ...result,
+    });
+  }
+);
+
+export const scanReceiptController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const file = req?.file;
+
+    const result = await scanReceiptService(file);
+
+    return res.status(HTTPSTATUS.OK).json({
+      message: "Reciept scanned successfully",
+      data: result,
+    });
+  }
+);
