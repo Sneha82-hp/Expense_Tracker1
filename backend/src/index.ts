@@ -82,14 +82,3 @@ app.listen(Env.PORT, async () => {
 
   console.log(`✅ Server is running on port ${Env.PORT} in ${Env.NODE_ENV} mode`);
 });
-
-
-
-
-
-
-
-
-
-
-

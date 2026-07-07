@@ -270,6 +270,13 @@ export const chartAnalyticsService = async (
       }),
   };
 
+console.log("Filter:", filter);
+
+const docs = await TransactionModel.find(filter);
+
+console.log("Matched transactions:", docs.length);
+
+console.log(docs);
   const result = await TransactionModel.aggregate([
     { $match: filter },
     //Group the transaction by date (YYYY-MM-DD)
