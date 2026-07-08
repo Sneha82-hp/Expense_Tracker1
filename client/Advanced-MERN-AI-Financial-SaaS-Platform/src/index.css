@@ -50,6 +50,7 @@ body {
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+
 :root {
   --bg-color: #f6f7f9;
   --secondary-dark-color: #1a1e2a;
@@ -87,6 +88,7 @@ body {
   --sidebar-border: oklch(0.92 0.004 286.32);
   --sidebar-ring: oklch(0.723 0.219 149.579);
 }
+
 
 .dark {
   --bg-color: #f6f7f9;

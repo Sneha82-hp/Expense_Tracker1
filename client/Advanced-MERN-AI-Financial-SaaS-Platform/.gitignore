@@ -24,3 +24,6 @@ _billing.tsx
 *.njsproj
 *.sln
 *.sw?
+# Environment files
+backend/.env
+
