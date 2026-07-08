@@ -1,6 +1,5 @@
-import { useTypedSelector } from "@/app/hook";
-import { Navigate, Outlet } from "react-router-dom";
-import { AUTH_ROUTES } from "./common/routePath";
+import { Outlet } from "react-router-dom";
+
 
 const ProtectedRoute = () => {
   //const {accessToken, user}= useTypedSelector((state) => state.auth);

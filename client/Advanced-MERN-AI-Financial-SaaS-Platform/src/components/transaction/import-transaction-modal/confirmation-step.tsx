@@ -143,7 +143,6 @@ const ConfirmationStep = ({
     let hasValidationErrors = false;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const results: Partial<any>[] = [];
-    const temp: any[] =[];
     
     console.log(csvData,mappings,"maping");
     csvData.forEach((row, index) => {
