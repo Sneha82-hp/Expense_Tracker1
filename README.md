@@ -4,6 +4,9 @@ Expenza is a modern full-stack personal finance management platform designed to 
 Users can record income and expenses, categorize transactions, monitor spending patterns, and gain personalized insights to make more informed financial decisions.
 The project focuses on combining **secure full-stack development, financial data management, analytics, and AI-powered insights** into a practical real-world application.
 
+## 🔗 Live Demo 
+[View Expenza](https://expense-tracker1-zeta.vercel.app/)
+
 ### 🌐 Real-World Use Cases
 
 Expenza can be used by:
@@ -37,7 +40,7 @@ Expenza can be used by:
 - Analyze spending patterns
 - Generate personalized financial insights
 - Provide recommendations based on transaction behavior
-- Help users identify areas for better financial management
+- AI-powered receipt scanning to extract transaction details automatically
 
 ### 🏗️ Technology Stack
 
