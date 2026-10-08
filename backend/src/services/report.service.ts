@@ -230,7 +230,7 @@ export async function generateInsightsAI({
       periodLabel,
     });
 
-    const model = genAI.getGenerativeModel({ model: "models/gemini-2.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "models/gemini-3.8-flash" });
     const result = await model.generateContent({
       contents: [{ role: "user", parts: [{ text: prompt }] }],
     });

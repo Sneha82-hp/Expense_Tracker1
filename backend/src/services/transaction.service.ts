@@ -10,7 +10,7 @@ import { createUserContent, receiptPrompt, createPartFromBase64 } from "../utils
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { Env } from "../config/env.config";
 const genAI = new GoogleGenerativeAI(Env.GEMINI_API_KEY);
-export const geminiModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+export const geminiModel = genAI.getGenerativeModel({ model: "gemini-3.8-flash" });
 
 
 
