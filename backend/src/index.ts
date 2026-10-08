@@ -37,8 +37,9 @@ app.use(passport.initialize());
 app.use(
   cors({
     origin: [Env.FRONTEND_ORIGIN,
-            "https://expense-tracker1-zeta.vercel.app",
-            "https://expense-tracker1-git-main-sneha40206-gmailcoms-projects.vercel.app"],
+      "https://expense-tracker1-zeta.vercel.app",
+      "https://expense-tracker1-git-main-sneha40206-gmailcoms-projects.vercel.app",
+      "https://expenza-szb7bd7v-sneha40206-gmailcoms-projects.vercel.app"],
     credentials: true,
   })
 );
